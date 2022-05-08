@@ -1,0 +1,120 @@
+body {
+  margin: 0;
+  text-align: center;
+  font-family: 'Open Sans', sans-serif;
+
+}
+
+h1 {
+  color: #66BFBF;
+  font-size: 5.625rem;
+  margin: 50px auto 0 auto;
+  font-family: 'Sacramento', cursive;
+  line-height: 1;
+
+}
+
+h2 {
+  color: #66BFBF;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 2.5rem;
+  font-weight: normal;
+}
+
+h3 {
+  color: #11999E;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.top-container {
+  background: #E4F9F5;
+  position: relative;
+  padding-top: 100px;
+}
+
+.middle-container
+
+.bottom-container
+
+
+.pro {
+  text-decoration: underline;
+}
+
+.top-cloud {
+  position: absolute;
+  right: 300px;
+  top: 50px;
+}
+
+.bottom-cloud {
+  position: absolute;
+  left: 300px;
+  bottom: 300px;
+}
+
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Matthew Koeppen</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" href="favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Merienda&family=Montserrat&family=Sacramento&display=swap" rel="stylesheet">
+  </head>
+
+  <body>
+  <div class="top-container">
+    <img class="top-cloud" src="images/cloud.png" alt="cloud-img">
+    <div class="title-text">
+    </div>
+    <h1><em>I'm Matthew</em></h1>
+    <h2>a <span class="pro">pro</span>grammer.</h2>
+  </div>
+    <img class="bottom-cloud" src="images/cloud.png" alt="cloud-img">
+    <img src="images/mountain.png" alt="mountain-img">
+  </div>
+
+  <div class="middle-container">
+    <div class="profile">
+      <img src="fake human guy.png" alt="Fake profile picture">
+      <h2>Hello.</h2>
+      <p>I am a Web Developer Student. I am currently doing The Complete 2022 Web Development Bootcamp. Learning to code has been a blast so far!</p>
+    </div>
+    <hr>
+    <div class="skills">
+      <h2>My Skills.</h2>
+      <div class="skill-row">
+        <img class="hiking.PNG" src="hiking trail.PNG" alt="hiking photo">
+        <h3>The Great Outdoors</h3>
+        <p>A love for the outdoors has always been in my heart. From going out hiking, to fishing a lake. Nothing compares to the beauty of nature.</p>
+      </div>
+      <div class="skill-row">
+        <img class="Programmer.PNG" src="Programmer.PNG" alt="programmer photo">
+        <h3>Programming</h3>
+        <p>In terms of coding, I might be considered a late bloomer. I started to learn to code when I was 32, but have been truly enjoying it as I learn.</p>
+      </div>
+    </div>
+    <hr>
+    <div class="contact-me">
+      <h2>Get In Touch</h2>
+      <h3>If you love nature and programming as much as I do.</h3>
+      <p>Love the great outdoors and coding as much as I do? Then let's talk about them.</p>
+      <a class="btn" href="mailto:matt.koeppen@gmail.com">CONTACT ME</a>
+    </div>
+  </div>
+
+
+  <div class="bottom-container">
+    <a class="footer-link" href="https://www.linkedin.com/">LinkedIn</a>
+    <a class="footer-link" href="https://twitter.com/">Twitter</a>
+    <a class="footer-link" href="https://www.appbrewery.co/">Website</a>
+    <p>© 2022 Matthew Koeppen.</p>
+  </div>
+
+
+
+  </body>
+</html>
