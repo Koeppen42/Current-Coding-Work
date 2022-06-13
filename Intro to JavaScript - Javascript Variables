@@ -1,0 +1,3 @@
+var myname = ("Angela");
+var yourname = prompt("What is your name?");
+alert("My name is " + myname + ", Welcome to my course" + yourname + "!");
