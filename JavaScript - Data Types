@@ -1,0 +1,14 @@
+alert("Hello");
+undefined
+
+2+8;
+10
+
+typeof(23)
+'number'
+
+typeof("Matt");
+'string'
+
+typeof(true);
+'boolean'
