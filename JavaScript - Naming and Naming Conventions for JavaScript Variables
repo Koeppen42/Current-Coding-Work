@@ -1,0 +1,7 @@
+var myName = "Ted";
+var yourName = "Jack Bauer";
+var myvar = "abc";
+var my123 = 123;
+var myname = "Ted";
+var my_name = "Ted";
+var userScoreFinal = 12;
