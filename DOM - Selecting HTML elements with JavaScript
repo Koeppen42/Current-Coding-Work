@@ -1,0 +1,58 @@
+document.querySelector("#list .item");
+<li class=​"item">​…​</li>​
+document.querySelector("#list a");
+<a href=​"https:​/​/​www.google.com">​Google​</a>​
+document.querySelectorAll("#list .item");
+NodeList(3) [li.item, li.item, li.item]
+document.querySelector("#list .item")[2].style.color = "blue";
+VM2060:1 Uncaught TypeError: Cannot read properties of undefined (reading 'style')
+    at <anonymous>:1:41
+(anonymous) @ VM2060:1
+document.querySelectorAll("#list .item")[2].style.color = "blue";
+'blue'
+document.querySelectorAll("#list .item")[0].style.color = "yellow";
+'yellow'
+document.querySelectorAll("#list .item a")[0].style.color = "yellow";
+'yellow'
+document.querySelector("li a");
+<a href=​"https:​/​/​www.google.com" style=​"color:​ yellow;​">​Google​</a>​
+document.querySelector("li a").style.color = "red";
+'red'
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>My Website</title>
+    <link rel="stylesheet" href="styles.css">
+
+  </head>
+  <body>
+
+    <h1 id="title">Hello</h1>
+    <a href="https://www.google.com">Google</a>
+    <input type="checkbox">
+
+    <button class="btn">Click Me</button>
+
+    <ul id="list">
+      <li class="item"><a href="https://www.google.com">Google</a></li>
+      <li class="item">Second</li>
+      <li class="item">Third</li>
+    </ul>
+
+  </body>
+  <footer>
+      <script src="index.js" charset="utf-8"></script>
+  </footer>
+</html>
+
+
