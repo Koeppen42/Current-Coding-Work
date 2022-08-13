@@ -1,0 +1,37 @@
+
+const express = require("express");
+
+const app = express();
+
+app.get("/", function(req, res){
+  res.send("<h1>Hello, world!</h1>");
+})
+
+
+app.get("/contact", function(req, res){
+  res.send("Contact me at: matt@gmail.com");
+});
+
+app.get("/about", function(req, res){
+  res.send("I am new to Tennessee and coding.");
+});
+
+app.get("/hobbies", function(req, res){
+  res.send("<ul><li>Fishing</li><li>Hiking</li><li>Code</li></ul>");
+});
+
+
+app.listen(3000, function(){
+  console.log("Server started on port 3000");
+});
+
+
+
+(installed nodemon in hyper that automatically notices changes in atoms code, and updates the server to current state)
+
+crtl c                             - exits out of server
+
+npm install -g nodemon             - installs nodemon onto server
+
+nodemon server.js                  - opens server now with nodemon running on server
+
