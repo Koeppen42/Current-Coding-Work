@@ -1,0 +1,27 @@
+(within hyper)
+cd Desktop/             - changes directory to desktop
+mkdir Calculator        - creates a folder on the desktop
+cd Calculator           - changes directory to Calculator folder
+touch calculator.js     - creates file calculator.js within Calculator folder
+npm init                - creates server
+
+atom .                  - pushes folder and files into atom
+npm install express     - installs express onto project
+nodemon calculator.js   - makes server automatically update when changes occur
+
+
+
+
+
+
+const express = require("express");
+
+const app = express();
+
+app.get("/", function(req, res){
+  res.send("Hello world!");
+});
+
+app.listen(3000, function(){
+  console.log("Server is running on port 3000.");
+});
