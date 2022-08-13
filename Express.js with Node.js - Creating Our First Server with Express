@@ -1,0 +1,35 @@
+(within hyper)
+
+mkdir my-express-server                  - creates folder
+
+cd my-express-server/                    - directory goes into new folder
+
+touch server.js                          - creates a new file in the folder
+
+npm init                                  - creates something
+
+atom .                                    - pushes new project folder into atom
+
+
+
+npm install express                         - installs express into atom
+
+node server.js                              - runs new server
+
+crtl c                                      - stops server from running
+
+
+
+
+(within server.js file in atom)
+
+const express = require("express");
+
+const app = express();
+
+app.listen(3000, function(){
+  console.log("Server started on port 3000");
+});
+
+
+
