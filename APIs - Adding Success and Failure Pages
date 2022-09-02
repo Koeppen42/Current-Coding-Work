@@ -1,0 +1,136 @@
+//jshint esversion: 6
+
+const express = require("express");
+const bodyParser = require("body-parser");
+const request = require("request");
+const https = require("https");
+
+const app = express();
+
+app.use(express.static("public"));
+app.use(bodyParser.urlencoded({extended: true}));
+
+app.get("/", function(req, res){
+  res.sendFile(__dirname + "/signup.html");
+});
+
+app.post("/", function(req, res){
+
+  const firstName = req.body.fName;
+  const lastName = req.body.lName;
+  const email = req.body.email;
+
+  const data = {
+    members: [
+      {
+        email_address: email,
+        status: "subscribed",
+        merge_fields: {
+          FNAME: firstName,
+          LNAME: lastName,
+        }
+      }
+    ]
+  };
+
+  const jsonData = JSON.stringify(data);
+
+  const url = "https://us17.api.mailchimp.com/3.0/lists/508c6ef411"
+
+  const options = {
+    method: "POST",
+    auth: "matthew1:62ed5abddb364da1b35bbc6acacabbdf-us17"
+  }
+
+  const request = https.request(url, options, function(response) {
+
+    if (response.statusCode === 200) {
+      res.sendFile(__dirname + "/success.html");
+    } else {
+      res.sendFile(__dirname + "/failure.html");
+    }
+
+    response.on("data", function(data){
+      console.log(JSON.parse(data));
+    });
+  });
+
+  request.write(jsonData);
+  request.end();
+
+});
+
+app.post("failure", function(req, res){
+  res.redirect("/");
+});
+
+app.listen(3000, function (){
+  console.log("Server is running on port 3000");
+});
+
+
+
+//API Key
+// 62ed5abddb364da1b35bbc6acacabbdf-us17
+
+
+//List Id
+//  508c6ef411
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Success</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+  </head>
+  <body>
+    <div class="jumbotron jumbotron-fluid">
+      <div class="container">
+        <h1 class="display-4">Awesome!</h1>
+        <p class="lead">You've been successfully signed up to the newsletter, look forward to lots of awesome content!</p>
+      </div>
+    </div>
+  </body>
+</html>
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Failure</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+  </head>
+  <body>
+    <div class="jumbotron jumbotron-fluid">
+      <div class="container">
+        <h1 class="display-4">Uh oh!</h1>
+        <p class="lead">There was a problem signing you up. Please try again or contact the developer!</p>
+
+        <form action="/failure" method="post">
+          <button class="btn  btn-lg btn-warning" type="submit" name="button">Try Again</button>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>
+
+
+
+
+
+
+
