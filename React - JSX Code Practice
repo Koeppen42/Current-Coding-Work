@@ -1,0 +1,14 @@
+import React from "react";
+import ReactDOM from "react-dom";
+
+ReactDOM.render(
+  <div>
+    <h1>My favorite Foods</h1>
+    <ul>
+      <li>Steak</li>
+      <li>Raspberries</li>
+      <li>Snickers</li>
+    </ul>
+  </div>,
+  document.getElementById("root")
+);
