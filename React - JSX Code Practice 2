@@ -1,0 +1,36 @@
+import React from "react";
+import ReactDOM from "react-dom";
+
+ReactDOM.render(
+  <div>
+    <h1>My Favorite Foods</h1>
+    <ul>
+      <li>Bacon</li>
+      <li>Meats</li>
+      <li>Greens</li>
+    </ul>
+  </div>,
+  document.getElementById("root")
+);
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>JSX</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script src="../src/index.js" type="text/javascript"></script>
+  </body>
+</html>
