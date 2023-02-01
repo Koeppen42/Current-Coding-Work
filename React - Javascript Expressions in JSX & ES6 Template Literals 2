@@ -1,0 +1,41 @@
+import React from "react";
+import ReactDOM from "react-dom";
+
+const fName = "Matthew";
+const lName = "Koep";
+const number = "42";
+
+ReactDOM.render(
+  <div>
+    <h1>Hello {fName} {lName}!</h1>
+    <h2>Hello {`${fName} ${lName}`}!</h2>        {/* <--ES6--  way to do it */}
+    <p>Your lucky number is {number}</p>
+  </div>,
+  document.getElementById("root")
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>JSX</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script src="../src/index.js" type="text/javascript"></script>
+  </body>
+</html>
