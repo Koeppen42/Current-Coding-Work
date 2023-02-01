@@ -1,0 +1,52 @@
+import React from "react";
+import ReactDOM from "react-dom";
+
+const fName = "Matthew";
+const lName = "Koeppen";
+const currentDate = new Date();
+const year = currentDate.getFullYear();
+
+ReactDOM.render(
+  <div>
+    <p>
+      Created by {fName} {lName}
+    </p>
+    <p>Copyright {year}</p>
+  </div>,
+  document.getElementById("root")
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>JSX</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script src="../src/index.js" type="text/javascript"></script>
+  </body>
+</html>
+
+
+
+
+
