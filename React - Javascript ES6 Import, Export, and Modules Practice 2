@@ -1,0 +1,63 @@
+import React from "react";
+import ReactDOM from "react-dom";
+import { add, multiply, subtract, divide } from "./calculator.js";
+
+ReactDOM.render(
+  <ul>
+    <li>{add(1, 2)}</li>
+    <li>{multiply(2, 3)}</li>
+    <li>{subtract(7, 2)}</li>
+    <li>{divide(5, 2)}</li>
+  </ul>,
+  document.getElementById("root")
+);
+
+
+
+
+
+
+
+
+
+
+function add(n1, n2) {
+  return n1 + n2;
+}
+
+function multiply(n1, n2) {
+  return n1 * n2;
+}
+
+function subtract(n1, n2) {
+  return n1 - n2;
+}
+
+function divide(n1, n2) {
+  return n1 / n2;
+}
+
+export { add, multiply, subtract, divide };
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>JSX</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script src="../src/index.js" type="text/JSX"></script>
+  </body>
+</html>
