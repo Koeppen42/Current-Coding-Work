@@ -1,0 +1,97 @@
+import React from "react";
+
+function Detail(props) {
+  return <p className="info">{props.detailInfo}</p>;
+}
+
+export default Detail;
+
+
+
+
+
+
+
+
+
+
+import React from "react";
+import Avatar from "./Avatar";
+import Detail from "./Detail";
+
+function Card(props) {
+  return (
+    <div className="card">
+      <div className="top">
+        <h2 className="name">{props.name}</h2>
+        <Avatar img={props.img} />
+      </div>
+      <div className="bottom">
+        <Detail detailInfo={props.tel} />
+        <Detail detailInfo={props.email} />
+      </div>
+    </div>
+  );
+}
+
+export default Card;
+
+
+
+
+
+
+
+
+
+
+import React from "react";
+
+function Avatar(props) {
+  return <img className="circle-img" src={props.img} alt="avatar_img" />;
+}
+
+export default Avatar;
+
+
+
+
+
+
+
+
+
+
+import React from "react";
+import Card from "./Card";
+import contacts from "../contacts";
+import Avatar from "./Avatar";
+
+function App() {
+  return (
+    <div>
+      <h1 className="heading">My Contacts</h1>
+      <Avatar img="https://media.licdn.com/dms/image/C5603AQH9NewAM4sX1g/profile-displayphoto-shrink_200_200/0/1612545489954?e=1680134400&v=beta&t=k729oDArI0QIN4VS8Z8QJaPCHkTc25xIcTbIKyvREms" />
+      <Card
+        name={contacts[0].name}
+        img={contacts[0].imgURL}
+        tel={contacts[0].phone}
+        email={contacts[0].email}
+      />
+      <Card
+        name={contacts[1].name}
+        img={contacts[1].imgURL}
+        tel={contacts[1].phone}
+        email={contacts[1].email}
+      />
+      <Card
+        name={contacts[2].name}
+        img={contacts[2].imgURL}
+        tel={contacts[2].phone}
+        email={contacts[2].email}
+      />
+    </div>
+  );
+}
+
+export default App;
