@@ -1,0 +1,109 @@
+import { dbank } from "../../declarations/dbank";
+
+window.addEventListener("load", async function() {
+    // console.log("Finished loading");
+    update();
+});
+
+document.querySelector("form").addEventListener("submit", async function(event) {
+   event.preventDefault();
+    // console.log("Submitted.");
+
+    const button = event.target.querySelector("#submit-btn");
+
+
+    const inputAmount = parseFloat(document.getElementById("input-amount").value);
+    const outputAmount = parseFloat(document.getElementById("withdrawal-amount").value);
+
+    button.setAttribute("disabled", true);
+
+    if (document.getElementById("input-amount").value.length != 0) {
+        await dbank.topUp(inputAmount);
+    }
+    
+    if (document.getElementById("withdrawal-amount").value.length != 0) {
+        await dbank.withdraw(outputAmount);
+    }
+
+    await dbank.compound();
+
+    update();
+
+    document.getElementById("input-amount").value = "";
+    document.getElementById("withdrawal-amount").value = "";
+
+    button.removeAttribute("disabled");
+
+});
+
+async function update() {
+    const currentAmount = await dbank.checkBalance();
+    document.getElementById("value").innerText = Math.round(currentAmount * 100) / 100;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import Debug "mo:base/Debug";
+import Time "mo:base/Time";
+import Float "mo:base/Float";
+
+actor DBank {
+  stable var currentValue: Float = 300;
+  currentValue := 300;
+  Debug.print(debug_show(currentValue));
+
+  stable var startTime = Time.now();
+  startTime := Time.now();
+  Debug.print(debug_show(startTime));
+
+  let id = 2348923840928349;
+  // Debug.print(debug_show(id));
+
+  public func topUp(amount: Float) {
+    currentValue += amount;
+    Debug.print(debug_show(currentValue));
+  };
+
+  public func withdraw(amount: Float) {
+    let tempValue: Float = currentValue - amount;
+    if (tempValue >= 0) { 
+    currentValue -= amount;
+    Debug.print(debug_show(currentValue));
+    } else {
+      Debug.print("Amount too large, currentValue less than zero.")
+    }
+  };
+
+  public query func checkBalance(): async Float {
+    return currentValue;
+  };
+
+  // topUp();
+
+  public func compound() {
+    let currentTime = Time.now();
+    let timeElapsedNS = currentTime - startTime;
+    let timeElapsedS = timeElapsedNS / 1000000000;
+    currentValue := currentValue * (1.01 ** Float.fromInt(timeElapsedS));
+    startTime := currentTime;
+  }
+
+}
+
