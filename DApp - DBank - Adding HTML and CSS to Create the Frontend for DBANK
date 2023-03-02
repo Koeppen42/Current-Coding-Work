@@ -1,0 +1,84 @@
+import Debug "mo:base/Debug";
+import Time "mo:base/Time";
+import Float "mo:base/Float";
+
+actor DBank {
+  stable var currentValue: Float = 300;
+  // currentValue := 300;
+
+  stable var startTime = Time.now();
+  // startTime := Time.now();
+  Debug.print(debug_show(startTime));
+
+  let id = 235498165189;
+  // Debug.print(debug_show(id));
+
+  public func topUp(amount: Float) {
+    currentValue += amount;
+    Debug.print(debug_show(currentValue));
+  };
+
+  public func withdrawal(amount: Float) {
+    let tempValue: Float = currentValue - amount;
+    if (tempValue >= 0) { 
+    currentValue -= amount;
+    Debug.print(debug_show(currentValue));
+    } else {
+      Debug.print("Amount too large, currentValue less than zero.")
+    }
+  };
+
+  public query func checkBalance(): async Float {
+    return currentValue;
+  };
+
+  // topUp();
+
+  public func compound() {
+    let currentTime = Time.now();
+    let timeElapsedNS = currentTime - startTime;
+    let timeElapsedS = timeElapsedNS / 1000000000;
+    currentValue := currentValue * (1.01 ** Float.fromInt(timeElapsedS));
+    startTime := currentTime;
+  }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <title>DBank</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link type="text/css" rel="stylesheet" href="main.css" />
+ 
+  </head>
+
+  <body>
+    <div class="container">
+      <img src="dbank_logo.png" alt="DBank logo" width="100"/>
+      <h1>Current Balance: $<span id="value">234</span></h1>
+      <div class="divider"></div>
+      <form action="#">
+      <h2>Amount to Top Up</h2>
+      <input id="input-amount" type="number" step="0.01" min=0 name="topUp" value=""/>
+      <h2>Amount to Withdraw</h2>
+      <input id="withdrawal-amount" type="number" name="withdraw" step="0.01" min=0 value=""/>
+      <input id="submit-btn" type="submit" value="Finalise Transaction" />
+    </form>
+    </div>
+  </body>
+
+</html>
