@@ -1,0 +1,50 @@
+import React from "react";
+import Header from "./Header";
+import Faucet from "./Faucet";
+import Balance from "./Balance";
+import Transfer from "./Transfer";
+
+function App() {
+
+  return (
+    <div id="screen">
+      <Header />
+      <Faucet />
+      <Balance />
+      <Transfer />
+    </div>
+  );
+}
+
+export default App;
+
+
+
+
+
+
+
+
+import ReactDOM from 'react-dom'
+import React from 'react'
+import App from "./components/App";
+
+const init = async () => { 
+  ReactDOM.render(<App />, document.getElementById("root"));
+}
+
+init();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
