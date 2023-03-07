@@ -1,0 +1,94 @@
+import Principal "mo:base/Principal";
+import HashMap "mo:base/HashMap";
+import Debug "mo:base/Debug";
+
+actor Token {
+
+    var owner : Principal = Principal.fromText("gbdey-tyqsv-hnvqv-7mgz4-4kcfl-wbv6x-6khez-y56gq-uohqs-quomc-uqe");
+    var totalSupply : Nat = 1000000000;
+    var symbol : Text = "KANG" 
+
+    var balances = HashMap.HashMap<Principal, Nat>(1, Principal.equal, Principal.hash);
+    balances.put(owner, totalSupply);
+
+    public query func balanceOf(who: Principal) : async Nat {
+
+        let balance : Nat = switch (balances.get(who)) {
+            case null 0;
+            case (?result) result;
+        };
+
+        return balance;        
+    }
+
+    public query func getSymbol() : async Text {
+        return symbol;
+    };
+
+    public shared(msg) func payOut() : async Text {
+        // Debug.print(debug_show(msg.caller));
+        if (balances.get(msg.caller) == null) {
+            let amount = 10000;
+            balances.put(msg.caller, )
+            return "Success";
+        } else {
+            return "Already claimed"
+        }
+        
+    };
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import React, { useState } from "react";
+import { token } from "../../../declarations/token";
+
+function Faucet() {
+
+  const [isDisabled, setDisabled] = useState(false);
+  const [buttonText, setText] = useState("Gimme Gimme");
+
+  async function handleClick(event) {
+    setDisabled(true);
+    const result = await token.payOut();
+    setText(result);
+    // setDisabled(false);
+  }
+
+  return (
+    <div className="blue window">
+      <h2>
+        <span role="img" aria-label="tap emoji">
+          🚰
+        </span>
+        Faucet
+      </h2>
+      <label>Get your free DAngela tokens here! Claim 10,000 DANG tokens to your account.</label>
+      <p className="trade-buttons">
+        <button 
+        id="btn-payout" 
+        onClick={handleClick}
+        disabled={isDisabled}
+        >
+          {buttonText}
+        </button>
+      </p>
+    </div>
+  );
+}
+
+export default Faucet;
