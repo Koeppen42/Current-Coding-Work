@@ -1,0 +1,294 @@
+import React from "react";
+import Header from "./Header";
+import Footer from "./Footer";
+import "bootstrap/dist/css/bootstrap.min.css";
+import Item from "./Item";
+import Minter from "./Minter";
+
+function App() {
+  // const NFTID = "rrkah-fqaaa-aaaaa-aaaaq-cai";
+
+  return (
+    <div className="App">
+      <Header />
+      {/* <Minter /> */}
+      {/* <Item id={NFTID}/> */}
+      
+      <Footer />
+    </div>
+  );
+}
+
+export default App;
+
+
+
+
+
+
+
+
+
+
+import React from "react";
+import logo from "../../assets/logo.png";
+import homeImage from "../../assets/home-img.png";
+import { BrowserRouter, Link, Switch, Route } from "react-router-dom";
+import Minter from "./Minter";
+import Gallery from "./Gallery";
+import { opend } from "../../../declarations/opend";
+import CURRENT_USER_ID from "../index";
+
+function Header() {
+
+  const [userOwnedGallery, setOwnedGallery] = useState();
+
+  async function getNFTs() {
+    const userNFTIds = await opend.getOwnedNFTs(CURRENT_USER_ID);
+    console.log(userNFTIds);
+    setOwnedGallery (<Gallery title="My NFTs" ids={userNFTIds} />);
+  };
+
+  useEffect(() => {
+    getNFTs();
+  }, []);
+
+
+  return (
+    <BrowserRouter forceRefresh={true}>
+    <div className="app-root-1">
+      <header className="Paper-root AppBar-root AppBar-positionStatic AppBar-colorPrimary Paper-elevation4">
+        <div className="Toolbar-root Toolbar-regular header-appBar-13 Toolbar-gutters">
+          <div className="header-left-4"></div>
+          <img className="header-logo-11" src={logo} />
+          <div className="header-vertical-9"></div>
+          <Link to="/">
+            <h5 className="Typography-root header-logo-text">OpenD</h5>
+          </Link>
+          <div className="header-empty-6"></div>
+          <div className="header-space-8"></div>
+          <button className="ButtonBase-root Button-root Button-text header-navButtons-3">
+            <Link to="/discover" >
+            Discover
+            </Link>
+          </button>
+          <button className="ButtonBase-root Button-root Button-text header-navButtons-3">
+            <Link to="/minter" >
+            Minter
+            </Link>
+          </button>
+          <button className="ButtonBase-root Button-root Button-text header-navButtons-3">
+            <Link to="/collection" >
+            My NFTs
+            </Link>
+          </button>
+        </div>
+      </header>
+    </div>
+    <Switch>
+      <Route exact path="/">
+      <img className="bottom-space" src={homeImage} />
+      </Route>
+      <Route path="/discover">
+        <h1>Discover</h1>
+      </Route>
+      <Route path="/minter">
+        <Minter />
+      </Route>
+      <Route path="/collection">
+        {userOwnedGallery}
+      </Route>
+    </Switch>
+    </BrowserRouter>
+  );
+}
+
+export default Header;
+
+
+
+
+
+
+
+
+
+
+
+
+import Cycles "mo:base/ExperimentalCycles";
+import Debug "mo:base/Debug";
+import NFTActorClass "../nft/nft";
+import Principal "mo:base/Principal";
+import HashMap "mo:base/HashMap";
+import NFTActorClass "../nft/nft";
+import List "mo:base/List";
+
+
+
+
+actor OpenD {
+
+    var mapOfNFTs = HashMap.HashMap<Principal, NFTActorClass.NFT>(1, Principal.equal, Principal.hash);
+    var mapOfOwners = HashMap.HashMap<Principal, List.List<Principal>>(1, Principal.equal, Principal.hash);
+
+    public shared(msg) func mint(imgData: [Nat8], name: Text) : async Principal {
+        let owner : Principal = msg.caller;
+
+        Debug.print(debug_show(Cycles.balance()));
+        Cycles.add(100_500_000_000);
+        let newNFT = await NFTActorClass.NFT(name, owner, imgData);
+
+        let newNFTPrincipal = await newNFT.getCanisterId();
+        
+        mapOfNFTs.put(newNFTPrincipal, newNFT);
+        addToOwnershipMap(owner, newNFTPrincipal);
+
+        return newNFTPrincipal();
+
+    };
+
+    private func addToOwnershipMap(owner: Principal, nftId: Principal) {
+        var ownedNFTs = List.list<Principal> = switch (mapOfOwners.get(owner)) {
+            case null List.nil<Principal>();
+            case (?result) result;
+        };
+
+        ownedNFTs := List.push(nftId, ownedNFTs);
+        mapOfOwners.put(owner, ownedNFTs);
+    }
+
+    public query func getOwnedNFTs(user: Principal) : async [Principal] {
+        var userNFTs : List.List<Principal> = switch (mapOfOwners.get(user)) {
+            case null List.nil<Principal>();
+            case (?result) result;
+        };
+
+        return List.toArray(userNFTs);
+    };
+
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+import React, { useState } from "react";
+import Item from "./Item";
+import { Principal } from "dfinity/principal";
+
+function Gallery(props) {
+
+  const [items, setItems] = useState();
+
+  function fetchNFTs() {
+    if (props.ids != undefined) {
+      setItems(
+        props.ids.map( (NFTId) => (
+          <Item id={NFTId} key={NFTId.toText()}/>
+        ));
+      )
+    }
+  }
+
+  useEffect(() => {
+    fetchNFTs();
+  }, []);
+
+  return (
+    <div className="gallery-view">
+      <h3 className="makeStyles-title-99 Typography-h3">{props.title}</h3>
+      <div className="disGrid-root disGrid-container disGrid-spacing-xs-2">
+        <div className="disGrid-root disGrid-item disGrid-grid-xs-12">
+          <div className="disGrid-root disGrid-container disGrid-spacing-xs-5 disGrid-justify-content-xs-center">
+          {items}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default Gallery;
+
+
+
+
+
+
+
+
+
+
+
+
+
+import React, { useEffect, useState } from "react";
+import logo from "../../assets/logo.png";
+import { Actor, HttpAgent } from "@dfinity/agent";
+import { idlFactory } from "../../../declarations/nft";
+import { Principal } from "@dfinity/principal";
+
+
+function Item(props) {
+  const [name, setName] = useState();
+  const [owner, setOwner] = useState();
+  const [image, setImage] = useState();
+
+  const id = props.id;
+
+    const localHost = "http://localhost:8080/";
+    const agent = new HttpAgent({host: localHost});
+
+    async function loadNFT() {
+      const NFTActor = await Actor.createActor(idleFactory, {
+        agent,
+        canisterId: id,
+      });
+
+    const name = await NFTActor.getName();
+    const owner = await NFTActor.getOwner();
+    const imageData = await NFTActor.getAsset();
+    const imageContent = new Uint8Array(imageData);
+    const image = URL.createObjectURL(
+      new Blob([imageContent.buffer], {type: "image/png" })
+    );
+
+    setName(name);
+    setOwner(owner.toText());
+    setImage(image);
+    }
+
+    useEffect(() => {
+      loadNFT();
+    }, []);
+
+  return (
+    <div className="disGrid-item">
+      <div className="disPaper-root disCard-root makeStyles-root-17 disPaper-elevation1 disPaper-rounded">
+        <img
+          className="disCardMedia-root makeStyles-image-19 disCardMedia-media disCardMedia-img"
+          src={image}
+        />
+        <div className="disCardContent-root">
+          <h2 className="disTypography-root makeStyles-bodyText-24 disTypography-h5 disTypography-gutterBottom">
+            {name}<span className="purple-text"></span>
+          </h2>
+          <p className="disTypography-root makeStyles-bodyText-24 disTypography-body2 disTypography-colorTextSecondary">
+            Owner: {owner}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default Item;
