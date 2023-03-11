@@ -1,0 +1,211 @@
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { opend } from "../../../declarations/opend";
+import { Principal } from "dfinity/principal";
+import Item from "./Item";
+
+function Minter() {
+
+    const {register, handleSubmit} = useForm();
+    const [nftPrincipal, setPrincipal] = useState("");
+    const [loaderHidden, setLoaderHidden] = useState(true);
+
+    async function onSubmit(data) {
+      setLoaderHidden(false);
+      const name = data.name;
+      const image = data.image[0];
+      const imageArray = await image.arrayBuffer();
+      const imageByteData = [...new Uint8Array(imageArray)];
+
+      const newNFTID = await opend.mint(imageByteData, name);
+      console.log(newNFTID.toText());
+      setNFTPrincipal(newNFTID);
+      setLoaderHidden(true);
+    }
+
+  if (nftPrincipal == "") {
+  return (
+    <div className="minter-container">
+        <div hidden={loaderHidden} className="lds-ellipsis">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+
+      </div>
+      <h3 className="makeStyles-title-99 Typography-h3 form-Typography-gutterBottom">
+        Create NFT
+      </h3>
+      <h6 className="form-Typography-root makeStyles-subhead-102 form-Typography-subtitle1 form-Typography-gutterBottom">
+        Upload Image
+      </h6>
+      <form className="makeStyles-form-109" noValidate="" autoComplete="off">
+        <div className="upload-container">
+          <input
+          {...register("image", { required: true })}
+            className="upload"
+            type="file"
+            accept="image/x-png,image/jpeg,image/gif,image/svg+xml,image/webp"
+          />
+        </div>
+        <h6 className="form-Typography-root makeStyles-subhead-102 form-Typography-subtitle1 form-Typography-gutterBottom">
+          Collection Name
+        </h6>
+        <div className="form-FormControl-root form-TextField-root form-FormControl-marginNormal form-FormControl-fullWidth">
+          <div className="form-InputBase-root form-OutlinedInput-root form-InputBase-fullWidth form-InputBase-formControl">
+            <input
+            {...register("name", {required: true})}
+              placeholder="e.g. CryptoDunks"
+              type="text"
+              className="form-InputBase-input form-OutlinedInput-input"
+            />
+            <fieldset className="PrivateNotchedOutline-root-60 form-OutlinedInput-notchedOutline"></fieldset>
+          </div>
+        </div>
+        <div className="form-ButtonBase-root form-Chip-root makeStyles-chipBlue-108 form-Chip-clickable">
+          <span onClick={handleSubmit(onSubmit)} className="form-Chip-label">Mint NFT</span>
+        </div>
+      </form>
+    </div>
+  );
+  } else {
+    return (
+    <div className="minter-container">
+        <h3 className="Typography-root makeStyles-title-99 Typography-h3 form-Typography-gutterBottom">
+          Minted!
+        </h3>
+          <div className="horizontal-center">
+            <Item id={nftPrincipal.toText()} />
+          </div>
+    </div>
+    );
+  }
+}
+
+export default Minter;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import Cycles "mo:base/ExperimentalCycles";
+import NFTActorClass "../nft/nft";
+import Principal "mo:base/Principal";
+import Debug "mo:base/Debug";
+
+
+actor OpenD {
+ 
+    public shared(msg) func mint(imgData: [Nat8], name: Text) : async Principal {
+        let owner : Principal = msg.caller;
+
+        Debug.print(debug_show(Cycles.balance()));
+        Cycles.add(100_500_000_000);
+        let newNFT = await NFTActorClass.NFT(name, owner, imgData);
+
+        let newNFTPrincipal = await newNFT.getCanisterId();
+
+        return newNFTPrincipal();
+
+    }
+
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import Debug "mo:base/Debug";
+import Principal "mo:base/Principal";
+
+actor class NFT (name: Text, owner: Principal, content: [Nat8])  = this {
+    
+    let itemName = name;
+    let nftOwner = owner;
+    let imageBytes = content;
+
+    public query func getName() : async Text{
+        return itemName;
+    };
+
+    public query func getOwner() : async Principal {
+        return nftOwner;
+    };
+
+    public query func getAsset() : async [Nat8] {
+        return imageBytes;
+    };
+
+    public query func getCanisterId() : async Principal {
+        return Principal.fromActor(this);
+    }
+
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import React from "react";
+import Header from "./Header";
+import Footer from "./Footer";
+import "bootstrap/dist/css/bootstrap.min.css";
+import homeImage from "../../assets/home-img.png";
+import Item from "./Item";
+import Minter from "./Minter";
+
+function App() {
+
+  const NFTID = "rrkah-fqaaa-aaaaa-aaaaq-cai";
+
+  return (
+    <div className="App">
+      <Header />
+      <Minter />
+      {/* <Item id={NFTID}/> */}
+      {/* <img className="bottom-space" src={homeImage} /> */}
+      <Footer />
+    </div>
+  );
+}
+
+export default App;
