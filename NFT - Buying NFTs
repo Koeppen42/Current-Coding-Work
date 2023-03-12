@@ -1,0 +1,488 @@
+import Cycles "mo:base/ExperimentalCycles";
+import Debug "mo:base/Debug";
+import NFTActorClass "../nft/nft";
+import Principal "mo:base/Principal";
+import HashMap "mo:base/HashMap";
+import List "mo:base/List";
+import Iter "mo:base/Iter";
+
+
+
+
+
+actor OpenD {
+
+    private type Listing = {
+        itemOwner: Principal;
+        itemPrice: Nat;
+    };
+
+    var mapOfNFTs = HashMap.HashMap<Principal, NFTActorClass.NFT>(1, Principal.equal, Principal.hash);
+    var mapOfOwners = HashMap.HashMap<Principal, List.List<Principal>>(1, Principal.equal, Principal.hash);
+    var mapOfListings = HashMap.HashMap<Principal, Listing>(1, Principal.equal, Principal.hash);
+
+    public shared(msg) func mint(imgData: [Nat8], name: Text) : async Principal {
+        let owner : Principal = msg.caller;
+
+        Debug.print(debug_show(Cycles.balance()));
+        Cycles.add(100_500_000_000);
+        let newNFT = await NFTActorClass.NFT(name, owner, imgData);
+
+        let newNFTPrincipal = await newNFT.getCanisterId();
+        
+        mapOfNFTs.put(newNFTPrincipal, newNFT);
+        addToOwnershipMap(owner, newNFTPrincipal);
+
+        return newNFTPrincipal();
+
+    };
+
+    private func addToOwnershipMap(owner: Principal, nftId: Principal) {
+        var ownedNFTs = List.list<Principal> = switch (mapOfOwners.get(owner)) {
+            case null List.nil<Principal>();
+            case (?result) result;
+        };
+
+        ownedNFTs := List.push(nftId, ownedNFTs);
+        mapOfOwners.put(owner, ownedNFTs);
+    }
+
+    public query func getOwnedNFTs(user: Principal) : async [Principal] {
+        var userNFTs : List.List<Principal> = switch (mapOfOwners.get(user)) {
+            case null List.nil<Principal>();
+            case (?result) result;
+        };
+
+        return List.toArray(userNFTs);
+    };
+
+    public query func getListedNFTs() : async [Principal] {
+       let ids = Iter.toArray(mapOfListings.keys());
+       return ids;
+    };
+
+    public shared(msg) func listItem(id: Principal, price: Nat) : async Text {
+        var item : NFTActorClass.NFT = switch (mapOfNFTs.get(id)) {
+            case null return "NFT does not exist.";
+            case (?result) result;
+        };
+
+        let owner = await item.getOwner();
+        if (Principal.equal(owner, msg.caller)) {
+            let newListing : Listing = {
+                itemOwner = owner;
+                itemPrice = price;
+            };
+            mapOfListings.put(id, newListing);
+            return "Success";
+        } else {
+            return "You don't own the NFT."
+        }
+    };
+
+    public query func getOpenDCanisterID() : async Principal {
+        return Principal.fromActor(OpenD);
+    }
+
+    public query func isListed(id: Principal) : async Bool {
+        if (mapOfListings.get(id) ==null) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    public query func getOriginalOwner(id: Principal) : async Principal {
+        var listing : Listing = switch (mapOfListings.get(id)) {
+            case null return Principal.fromText("");
+            case (?result) result;
+        };
+
+        return listing.itemOwner;
+    };
+
+    public query func getListedNFTPrice(id: Principal) : async Nat {
+        var listing: Listing = switch (mapOfListings.get(id)) {
+            case null return 0;
+            case (?result) result;
+        };
+
+        return listing.itemPrice;
+    }
+
+    public shared(msg) func completePurchase(id: Principal, ownerId: Principal, newOwnerId: Principal) : async Text {
+        var purchasedNFT : NFTActorClass.NFT = switch (mapOfNFTs.get(id)) {
+            case null return "NFT does not exist";
+            case (?result) result
+        };
+
+        let transferResult = await purchasedNFT.transferOwnership(newOwnerId);
+        if (transferResult == "Success") {
+            mapOfListings.delete(id);
+            var ownedNFTs : List.list<Principal> = switch (mapOfOwners.get(id)) {
+                case null List.nil<Principal>();
+                case (?result) result;
+            };
+            ownedNFTs := List.filter(ownedNFTs, func (listItemId: Principal) : Bool {
+                return listItemId != id;
+            });
+            addToOwnershipMap(newOwnerId, id);
+             return "Success";
+        } else {
+            return transferResult;
+        }
+
+       
+    };
+
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import React from "react";
+import logo from "../../assets/logo.png";
+import homeImage from "../../assets/home-img.png";
+import { BrowserRouter, Link, Switch, Route } from "react-router-dom";
+import Minter from "./Minter";
+import Gallery from "./Gallery";
+import { opend } from "../../../declarations/opend";
+import CURRENT_USER_ID from "../index";
+
+function Header() {
+
+  const [userOwnedGallery, setOwnedGallery] = useState();
+  const [listingGallery, setListingGallery] = useState();
+
+  async function getNFTs() {
+    const userNFTIds = await opend.getOwnedNFTs(CURRENT_USER_ID);
+    console.log(userNFTIds);
+    setOwnedGallery (<Gallery title="My NFTs" ids={userNFTIds} role="collection"/>);
+
+
+    const listedNFTIds = await opend.getListedNFTs();
+    console.log(listedNFTIds);
+    setListingGallery(<Gallery title="Discover" ids={listedNFTIDs} role="discover"/>);
+
+  };
+
+  useEffect(() => {
+    getNFTs();
+  }, []);
+
+
+  return (
+    <BrowserRouter forceRefresh={true}>
+    <div className="app-root-1">
+      <header className="Paper-root AppBar-root AppBar-positionStatic AppBar-colorPrimary Paper-elevation4">
+        <div className="Toolbar-root Toolbar-regular header-appBar-13 Toolbar-gutters">
+          <div className="header-left-4"></div>
+          <img className="header-logo-11" src={logo} />
+          <div className="header-vertical-9"></div>
+          <Link to="/">
+            <h5 className="Typography-root header-logo-text">OpenD</h5>
+          </Link>
+          <div className="header-empty-6"></div>
+          <div className="header-space-8"></div>
+          <button className="ButtonBase-root Button-root Button-text header-navButtons-3">
+            <Link to="/discover" >
+            Discover
+            </Link>
+          </button>
+          <button className="ButtonBase-root Button-root Button-text header-navButtons-3">
+            <Link to="/minter" >
+            Minter
+            </Link>
+          </button>
+          <button className="ButtonBase-root Button-root Button-text header-navButtons-3">
+            <Link to="/collection" >
+            My NFTs
+            </Link>
+          </button>
+        </div>
+      </header>
+    </div>
+    <Switch>
+      <Route exact path="/">
+      <img className="bottom-space" src={homeImage} />
+      </Route>
+      <Route path="/discover">
+        {listingGallery}
+      </Route>
+      <Route path="/minter">
+        <Minter />
+      </Route>
+      <Route path="/collection">
+        {userOwnedGallery}
+      </Route>
+    </Switch>
+    </BrowserRouter>
+  );
+}
+
+export default Header;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import React, { useState } from "react";
+import Item from "./Item";
+import { Principal } from "dfinity/principal";
+
+function Gallery(props) {
+
+  const [items, setItems] = useState();
+
+  function fetchNFTs() {
+    if (props.ids != undefined) {
+      setItems(
+        props.ids.map( (NFTId) => (
+          <Item id={NFTId} key={NFTId.toText()} role={props.role}/>
+        ));
+      )
+    }
+  }
+
+  useEffect(() => {
+    fetchNFTs();
+  }, []);
+
+  return (
+    <div className="gallery-view">
+      <h3 className="makeStyles-title-99 Typography-h3">{props.title}</h3>
+      <div className="disGrid-root disGrid-container disGrid-spacing-xs-2">
+        <div className="disGrid-root disGrid-item disGrid-grid-xs-12">
+          <div className="disGrid-root disGrid-container disGrid-spacing-xs-5 disGrid-justify-content-xs-center">
+          {items}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default Gallery;
+
+
+
+
+
+
+
+
+
+
+
+
+
+import React from "react";
+
+function PriceLabel(props) {
+    return (
+
+<div className="disButtonBase-root disChip-root makeStyles-price-23 disChip-outlined">
+          <span className="disChip-label">{props.sellPrice} KANG</span>
+        </div>
+    );
+}
+
+export default PriceLabel;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import React, { useEffect, useState } from "react";
+import logo from "../../assets/logo.png";
+import { Actor, HttpAgent } from "@dfinity/agent";
+import { idlFactory } from "../../../declarations/nft";
+import { idlFactory as tokenIdlFactory } from "../../../declarations/token";
+import { Principal } from "@dfinity/principal";
+import { opend } from "../../../declarations/opend";
+import Button from "./Button";
+import CURRENT_USER_ID from "../index";
+import PriceLabel from "./PriceLabel";
+
+
+function Item(props) {
+  const [name, setName] = useState();
+  const [owner, setOwner] = useState();
+  const [image, setImage] = useState();
+  const [button, setButton] = useState();
+  const [priceInput, setPriceInput] = useState();
+  const [loaderHidden, setLoaderHidden] = useState(true);
+  const [blur, setBlur] = useState();
+  const [sellStatus, setSellStatus] = useState("");
+  const [priceLabel, setPriceLabel] = useState();
+  const [shouldDisplay, setDisplay] = useState(true);
+
+  const id = props.id;
+
+    const localHost = "http://localhost:8080/";
+    const agent = new HttpAgent({host: localHost});
+    agent.fetchRootKey();
+    let NFTActor;
+
+    async function loadNFT() {
+      NFTActor = await Actor.createActor(idleFactory, {
+        agent,
+        canisterId: id,
+      });
+
+    const name = await NFTActor.getName();
+    const owner = await NFTActor.getOwner();
+    const imageData = await NFTActor.getAsset();
+    const imageContent = new Uint8Array(imageData);
+    const image = URL.createObjectURL(
+      new Blob([imageContent.buffer], {type: "image/png" })
+    );
+
+    setName(name);
+    setOwner(owner.toText());
+    setImage(image);
+    
+    if (props.role == "collection") {
+    const nftIsListed = await opend.isListed(props.id);
+
+    if (nftIsListed) {
+      setOwner("OpenD")
+      setBlur({ filter: "blur(4px)" });
+      setSellStatus("Listed");
+    } else {
+      setButton(<Button handleClick={handleSell} text={"Sell"}/>);
+    }
+  } else if (props.role == "discover") {
+    const originalOwner = await opend.getOriginalOwner(props.id);
+    if (originalOwner.toText() != CURRENT_USER_ID.toText()) {
+      setButton(<Button handleClick={handleBuy} text={"Buy"}/>);
+    }
+
+    const price = await opend.getListedNFTPrice(props.id);
+    setPriceLabel(<PriceLabel sellPrice={price.toString()} />);
+
+
+  }
+    }
+
+    useEffect(() => {
+      loadNFT();
+    }, []);
+
+    let price;
+    function handleSell() {
+      console.log("Sell clicked");
+      setPriceInput(
+      <input
+        placeholder="Price in KANG"
+        type="number"
+        className="price-input"
+        value={price}
+        onChange={(e) => price=e.target.value}
+      />
+      );
+      setButton(<Button handleClick={sellItem} text={"Confirm"}/>);
+    }
+
+    async function sellItem() {
+      setBlur({filter: "blur(4px)"});
+      setLoaderHidden(false);
+      console.log("set price = " + price);
+      const listingResult = await opend.ListItem(props.id, Number(price));
+      console.log("listing: " + listingResult);
+      if (listingResult == "Success") {
+        const openDId = await opend.getOpenDCanisterID();
+        const transferResult = await NFTActor.transferOwnership(openDId);
+        console.log("transfer: " + transferResult);
+        if (transferResult == "Success") {
+          setLoaderHidden(true);
+          setButton();
+          setPriceInput();
+          setOwner("OpenD");
+          setSellStatus("Listed");
+        }
+      }
+    }
+
+    async function handleBuy() {
+      console.log("Buy was triggered")
+      setLoaderHidden(false);
+      const tokenActor = await Actor.createActor(tokenIdlFactory, {
+        agent,
+        canisterId: Principal.fromText("rdmx6-jaaaa-aaaaa-aaadq-cai"),
+      });
+
+      const sellerId = await opend.getOriginalOwner(props.id);
+      const itemPrice = await opend.getListedNFTPrice(props.id);
+
+      const result = await tokenActor.transfer(sellerId, itemPrice);
+      if (result == "Success") {
+        const transferResult = await opend.completePurchase(props.id, sellerId, CURRENT_USER_ID);
+        console.log("purchase: " + transferResult);
+        setLoaderHidden(true);
+        setDisplay(false);
+      }
+    }
+
+
+  return (
+    <div style={{ display: shouldDisplay ? "inline" : "none" }} className="disGrid-item">
+      <div className="disPaper-root disCard-root makeStyles-root-17 disPaper-elevation1 disPaper-rounded">
+        <img
+          className="disCardMedia-root makeStyles-image-19 disCardMedia-media disCardMedia-img"
+          src={image}
+          style={blur}
+        />
+        <div className="lds-ellipsis" hidden={loaderHidden}>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
+        <div className="disCardContent-root">
+        {PriceLabel}
+          <h2 className="disTypography-root makeStyles-bodyText-24 disTypography-h5 disTypography-gutterBottom">
+            {name}
+            <span className="purple-text"> { sellStatus}</span>
+          </h2>
+          <p className="disTypography-root makeStyles-bodyText-24 disTypography-body2 disTypography-colorTextSecondary">
+            Owner: {owner}
+          </p>
+          {priceInput}
+          {button}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default Item;
